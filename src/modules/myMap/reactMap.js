@@ -2,10 +2,10 @@ import * as React from "react"
 import Map, { NavigationControl } from "react-map-gl/maplibre"
 
 // {children è fondamentale per avere il render di <SourceLayer/>
-const Map2 = ({ children }) => {
+const Map2 = ({ children, longitude, latitude }) => {
   const initialViewState = {
-    longitude: 12.4964,
-    latitude: 41.9028,
+    longitude: longitude || 12.4964,
+    latitude: latitude || 41.9028,
     zoom: 8,
   }
   const style = { width: "100%", height: 400 }
