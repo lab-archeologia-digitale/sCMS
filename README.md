@@ -15,3 +15,12 @@ npm start
 `Documentation to be completed`
 
 # Maplibre
+
+https://visgl.github.io/react-map-gl/
+
+npm install --save react-map-gl maplibre-gl
+
+- Creato file reactMap.js per gestire la mappa base
+- Creato file sourceLayer.js per gestire i livelli della mappa (come leaflet)
+
+- Manca da mettere popup e layer control.
