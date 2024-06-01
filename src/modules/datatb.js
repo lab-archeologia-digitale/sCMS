@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
 import DataTable from "react-data-table-component"
+import queryString from "query-string"
 import getData from "../services/getData"
 
 const DataTb = props => {
@@ -36,6 +37,12 @@ const DataTb = props => {
   useEffect(() => {
     setIsLoading(true)
 
+    // Analizza la query string dell'URL
+    const parsedQuery = queryString.parse(window.location.search)
+    const queryFilter = parsedQuery.q ? parsedQuery.q : null
+
+    console.log(queryFilter)
+
     if (props.path2csv) {
       getData(props.path2csv, null, "csv2json")
         .then(jsonData => {
@@ -65,8 +72,17 @@ const DataTb = props => {
         setIsLoading(false)
         return
       }
-      if (props.dFilter) {
-        endPoint += `?${props.dFilter}`
+      if (queryFilter) {
+        const filters = queryFilter
+          .split(",")
+          .map(f => {
+            const [field, value] = f.split(":")
+            return `filter[${field}][_icontains]=${value}`
+          })
+          .join("&")
+        endPoint += `&${filters}`
+      } else if (props.dFilter) {
+        endPoint += `&${props.dFilter}`
       }
       // Define Directus token
       const token = props.dToken
