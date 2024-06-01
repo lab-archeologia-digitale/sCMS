@@ -6,8 +6,11 @@ import Map, {
   ScaleControl,
   GeolocateControl,
   Popup,
+  Source,
+  Layer,
 } from "react-map-gl/maplibre"
 import ControlPanel from "./control-panel"
+import { defaultBaseLayers } from "./defaultBaseLayers"
 import styled from "styled-components"
 
 // {children è fondamentale per avere il render di <SourceLayer/>
@@ -18,7 +21,14 @@ const Map2 = ({ children, longitude, latitude, interactiveLayerIds }) => {
     zoom: 8,
   }
   const style = { width: "100%", height: 400 }
-  const mapStyle = "https://demotiles.maplibre.org/style.json"
+  //const mapStyle = "https://demotiles.maplibre.org/style.json"
+
+  const [mapStyle, setMapStyle] = useState(defaultBaseLayers.OSM.url) // Default style
+
+  const handleLayerChange = styleUrl => {
+    setMapStyle(styleUrl)
+  }
+
   const [hoverInfo, setHoverInfo] = useState(null)
 
   const onHover = useCallback(event => {
@@ -35,11 +45,18 @@ const Map2 = ({ children, longitude, latitude, interactiveLayerIds }) => {
         <Map
           initialViewState={initialViewState}
           style={style}
-          mapStyle={mapStyle}
+          mapStyle="https://demotiles.maplibre.org/style.json" // Keep a default Mapbox style for initialization
           interactiveLayerIds={[interactiveLayerIds]}
           onMouseMove={onHover}
         >
           {children}
+          <Source
+            id="basemap"
+            type="raster"
+            tiles={[mapStyle]}
+            tileSize={256}
+          />
+          <Layer id="basemap-layer" type="raster" source="basemap" />
           {hoverInfo && (
             <Popup
               anchor="top"
@@ -57,7 +74,12 @@ const Map2 = ({ children, longitude, latitude, interactiveLayerIds }) => {
           <FullscreenControl position="top-left" />
           <NavigationControl position="top-left" />
           <ScaleControl />
-          <ControlPanel />
+          <ControlPanel
+            position="top-right"
+            baseLayers={defaultBaseLayers}
+            selectedLayer={mapStyle}
+            onLayerChange={handleLayerChange}
+          />
         </Map>
       </Mappa>
     </>
@@ -70,14 +92,15 @@ const Mappa = styled.div`
     position: relative;
     top: 0;
     right: -550px;
-    max-width: 120px;
+    max-width: 200px;
     background: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     padding: 10px;
     margin: 20px;
     line-height: 2;
     color: #6b6b76;
-    text-transform: uppercase;
+    text-transform: lowercase;
+    font-size: 10px;
     outline: none;
   }
   h3,

@@ -24,3 +24,7 @@ npm install --save react-map-gl maplibre-gl
 - Creato file sourceLayer.js per gestire i livelli della mappa (come leaflet)
 
 - Manca da mettere popup e layer control.
+
+# Query direttamente dall'url
+
+npm install query-string
