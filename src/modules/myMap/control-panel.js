@@ -1,6 +1,11 @@
 import React, { useState } from "react"
 
-const ControlPanel = ({ baseLayers, selectedLayer, onLayerChange }) => {
+const ControlPanel = ({
+  baseLayers,
+  selectedLayer,
+  onLayerChange,
+  sourceLayers,
+}) => {
   const [isVisible, setIsVisible] = useState(false)
 
   const toggleVisibility = () => {
