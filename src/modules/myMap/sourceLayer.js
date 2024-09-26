@@ -16,8 +16,10 @@ const SourceLayer = ({
   fitToContent,
   geoField,
   layerstyle,
+  searchTerm, // Aggiungi searchTerm come props
 }) => {
   const [geojsonData, setGeojson] = useState()
+  const [filteredData, setFilteredData] = useState(null)
   const [error, setError] = useState(false)
   const map = useMap()
 
@@ -72,6 +74,23 @@ const SourceLayer = ({
     }
   }, [path2geojson, dEndPoint, dTable, dFilter, dToken, geoField]) // L'array di dipendenze vuoto assicura che questo effetto venga eseguito solo una volta, simile a componentDidMount
 
+  // Filtra i dati in base a searchTerm
+  useEffect(() => {
+    if (geojsonData) {
+      const lowerCaseTerm = searchTerm ? searchTerm.toLowerCase() : ""
+      const filteredFeatures = geojsonData.features.filter(feature => {
+        return Object.values(feature.properties).some(prop =>
+          String(prop).toLowerCase().includes(lowerCaseTerm)
+        )
+      })
+
+      setFilteredData({
+        ...geojsonData,
+        features: filteredFeatures,
+      })
+    }
+  }, [geojsonData, searchTerm])
+
   if (error) {
     console.log(error)
     return <></>
@@ -85,11 +104,12 @@ const SourceLayer = ({
         [lBb[3], lBb[2]],
       ])
     }
-
     return (
-      <Source id={id} type={type} data={geojsonData}>
-        <Layer {...layerstyle} />
-      </Source>
+      <>
+        <Source id={id} type={type} data={filteredData || geojsonData}>
+          <Layer {...layerstyle} />
+        </Source>
+      </>
     )
   }
 }

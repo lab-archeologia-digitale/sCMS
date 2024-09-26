@@ -14,7 +14,8 @@ const Map = () => {
 
     map.current = new maplibregl.Map({
       container: mapContainer.current,
-      style: `https://demotiles.maplibre.org/style.json`,
+      //style: `https://demotiles.maplibre.org/style.json`,
+      style: `data/ksa.json`,
       center: [lng, lat],
       zoom: zoom,
     })

@@ -244,19 +244,20 @@ import { Map } from "../modules/myMap/mapLibre.js"
 
 <div className="row">
   <div className="col-sm-4">
+  Mappa con collegamento a Directus con FILE ENV
     ```
     <MapComp height="400px" center="43,13.32,11" baseLayers="OSM,EsriSatellite">
       <VectorLayer
-        name="Toponimi"
+        name="Sites"
         fitToContent={true}
         checked={true}
-        dEndPoint="https://landscapearchaeology.eu/db/items/toponimi"
-        dToken="sxE2XHdJMWJiymA9w2QJFGJWG9AAnq6E"
-        dFilter="filter[provincia][_eq]=Macerata"
+        dEndPoint="https://db.lad-sapienza.it/curry/items/scms_ksa"
+        dToken="TzwQYgn4PSk5czDvQsT39gx8EByfBdiN"
+        dFilter="filter[Iron_Age][_eq]=true"
         popupTemplate={attribs => {
-          return `<p><strong>${attribs.toponimo}</strong>`
+          return `<p><strong>${attribs.Item_Label}</strong>`
         }}
-        geoField="coordinates"
+        geoField="geometry"
       />
     </MapComp>
     ```
@@ -264,30 +265,29 @@ import { Map } from "../modules/myMap/mapLibre.js"
   <div className="col-sm-8">
     <MapComp height="400px" baseLayers="OSM,EsriSatellite">
       <VectorLayer
-        name="Toponimi"
+        name="Sites"
         fitToContent={true}
         checked={true}
-        dEndPoint="https://landscapearchaeology.eu/db/items/toponimi"
-        dToken="sxE2XHdJMWJiymA9w2QJFGJWG9AAnq6E"
-        dFilter="filter[provincia][_eq]=Macerata"
+        dEndPoint="https://db.lad-sapienza.it/curry/items/scms_ksa"
+        dToken="TzwQYgn4PSk5czDvQsT39gx8EByfBdiN"
+        dFilter="filter[Iron_Age][_eq]=true"
         popupTemplate={attribs => {
-          return `<p><strong>${attribs.toponimo}</strong>`
+          return `<p><strong>${attribs.Item_Label}</strong>`
         }}
-        geoField="coordinates"
+        geoField="geometry"
       />
     </MapComp>
   </div>
 </div>
 
-<div className="row">
-  <div className="col-sm-4">
-  Maplibre
-  Esempio libreria maplibre-gl
-  </div>
-  <div className="col-sm-8"><br/>
-    <Map />
+<div className="row mt-5 mb-5">
+  <div className="col-sm-12">
+  <b>INIZIO ESEMPI CON NUOVO MAPLIBRE USANDO IL TAG MAP2</b>
+
   </div>
 </div>
+
+
 <div className="row">
   <div className="col-sm-4">
  Esempio libreria react-map-gl
@@ -296,7 +296,7 @@ A map with geodata sourced from a GeoJSON file hosted in the same server: only a
 
 ```
 
- <Map2 longitude={12.4964} latitude={41.9028} interactiveLayerIds ={"toponimi1"}>
+ <Map2 longitude={12.4964} latitude={41.9028} interactiveLayerIds ={["toponimi1"]}>
 <SourceLayer
 id="1"
 type="geojson"
@@ -315,7 +315,7 @@ layerstyle={{
 ```
 </div>
   <div className="col-sm-8"><br/>
- <Map2 longitude={12.4964} latitude={41.9028} interactiveLayerIds ={"toponimi1"}>
+ <Map2 longitude={12.4964} latitude={41.9028} interactiveLayerIds ={["toponimi1"]}>
 <SourceLayer
 id="1"
 type="geojson"
@@ -340,13 +340,15 @@ layerstyle={{
  A map sourced from the default Directus database with endpoint/dtoken/dfilter:
 
 ```
- <Map2 longitude={13.2431} latitude={42.9807} interactiveLayerIds ={"toponimi2"}>
+ <Map2 longitude={13.2431} latitude={42.9807} interactiveLayerIds ={["toponimi2"]}>
 <SourceLayer
   id="2"
   type="geojson"
-  dEndPoint="https://landscapearchaeology.eu/db/items/toponimi"
-  dToken="sxE2XHdJMWJiymA9w2QJFGJWG9AAnq6E"
-  dFilter="filter[provincia][_eq]=Macerata"
+  dEndPoint="https://db.lad-sapienza.it/curry/items/scms_ksa"
+  dToken="TzwQYgn4PSk5czDvQsT39gx8EByfBdiN"
+  dFilter="filter[Iron_Age][_eq]=true"
+  geoField="geometry"
+  fitToContent={true}
   layerstyle={{
     id: "toponimi2",
     type: "circle",
@@ -360,13 +362,14 @@ layerstyle={{
 ```
 </div>
   <div className="col-sm-8"><br/>
- <Map2 longitude={13.2431} latitude={42.9807} interactiveLayerIds ={"toponimi2"}>
+ <Map2 longitude={13.2431} latitude={42.9807} interactiveLayerIds ={["toponimi2"]}>
 <SourceLayer
   id="2"
   type="geojson"
-  dEndPoint="https://landscapearchaeology.eu/db/items/toponimi"
-  dToken="sxE2XHdJMWJiymA9w2QJFGJWG9AAnq6E"
-  dFilter="filter[provincia][_eq]=Macerata"
+  dEndPoint="https://db.lad-sapienza.it/curry/items/scms_ksa"
+  dToken="TzwQYgn4PSk5czDvQsT39gx8EByfBdiN"
+  dFilter="filter[Iron_Age][_eq]=true"
+  geoField="geometry"
   layerstyle={{
     id: "toponimi2",
     type: "circle",
@@ -376,6 +379,71 @@ layerstyle={{
     },
   }}
 />
+ </Map2>
+</div>
+</div>
+
+
+<div className="row">
+  <div className="col-sm-4">
+
+ STYLE PERSONALIZZATO, CARICA SIA IL SOURCELAYER IMPOSTATO NORMALMENTE CHE I DATI PRESENTI NEL FILE KSA:
+
+```
+<Map2
+  longitude={12.4964}
+  latitude={41.9028}
+  interactiveLayerIds={["ksa", "toponimi1"]}
+  styleJson="../data/ksa.json"
+>
+<SourceLayer
+    id="1"
+    type="geojson"
+    path2geojson="../data/toponimi.geojson"
+    layerstyle={{
+      id: "toponimi1",
+      type: "circle",
+      paint: {
+        "circle-radius": 10,
+        "circle-color": "#007cbf",
+      },
+    }}
+  />
+ </Map2>
+```
+</div>
+  <div className="col-sm-8"><br/>
+ <Map2
+  longitude={12.4964}
+  latitude={41.9028}
+  interactiveLayerIds={["ksa", "toponimi1"]}
+  styleJson="../data/ksa.json"
+  layerId ="ksa"
+  filterConditions={[
+  "Chalcolithic",
+  "Early Bronze",
+  "Early_Bronze_Middle_Bronze",
+  "Middle_Bronze",
+  "Late_Bronze",
+  "Iron_Age",
+  "Hellenistic_Roman",
+  "Medieval",
+    "Item_Label"
+  ]}
+>
+<SourceLayer
+    id="1"
+    type="geojson"
+    path2geojson="../data/toponimi.geojson"
+    layerstyle={{
+      id: "toponimi1",
+      type: "circle",
+      paint: {
+        "circle-radius": 10,
+        "circle-color": "#007cbf",
+      },
+    }}
+  />
  </Map2>
 
   </div>
