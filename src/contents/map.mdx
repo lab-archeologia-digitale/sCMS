@@ -117,7 +117,7 @@ import { Map } from "../modules/myMap/mapLibre.js"
         popupTemplate={attribs => {
           return `<p><strong>${attribs.toponimo}</strong>`
         }}
-        geoField="coordinates"
+        geoField="geometry"
       />
       <RasterLayer
         name="Open Street Map"
@@ -184,7 +184,7 @@ import { Map } from "../modules/myMap/mapLibre.js"
         popupTemplate={attribs => {
           return `<p><strong>${attribs.toponimo}</strong>`
         }}
-        geoField="coordinates"
+        geoField="geometry"
       />
       <RasterLayer
         name="Open Street Map"
@@ -340,17 +340,16 @@ layerstyle={{
  A map sourced from the default Directus database with endpoint/dtoken/dfilter:
 
 ```
- <Map2 longitude={13.2431} latitude={42.9807} interactiveLayerIds ={["toponimi2"]}>
+ <Map2 interactiveLayerIds={["ksa-directus"]}>
 <SourceLayer
   id="2"
   type="geojson"
   dEndPoint="https://db.lad-sapienza.it/curry/items/scms_ksa"
-  dToken="TzwQYgn4PSk5czDvQsT39gx8EByfBdiN"
   dFilter="filter[Iron_Age][_eq]=true"
   geoField="geometry"
   fitToContent={true}
   layerstyle={{
-    id: "toponimi2",
+    id: "ksa-directus",
     type: "circle",
     paint: {
       "circle-radius": 10,
@@ -362,16 +361,15 @@ layerstyle={{
 ```
 </div>
   <div className="col-sm-8"><br/>
- <Map2 longitude={13.2431} latitude={42.9807} interactiveLayerIds ={["toponimi2"]}>
+ <Map2 interactiveLayerIds={["ksa-directus"]}>
 <SourceLayer
   id="2"
   type="geojson"
   dEndPoint="https://db.lad-sapienza.it/curry/items/scms_ksa"
-  dToken="TzwQYgn4PSk5czDvQsT39gx8EByfBdiN"
   dFilter="filter[Iron_Age][_eq]=true"
   geoField="geometry"
   layerstyle={{
-    id: "toponimi2",
+    id: "ksa-directus",
     type: "circle",
     paint: {
       "circle-radius": 10,
@@ -420,14 +418,14 @@ layerstyle={{
   styleJson="../data/ksa.json"
   layerId ="ksa"
   filterConditions={[
-  "Chalcolithic",
-  "Early Bronze",
-  "Early_Bronze_Middle_Bronze",
-  "Middle_Bronze",
-  "Late_Bronze",
-  "Iron_Age",
-  "Hellenistic_Roman",
-  "Medieval",
+    "Chalcolithic",
+    "Early Bronze",
+    "Early_Bronze_Middle_Bronze",
+    "Middle_Bronze",
+    "Late_Bronze",
+    "Iron_Age",
+    "Hellenistic_Roman",
+    "Medieval",
     "Item_Label"
   ]}
 >
