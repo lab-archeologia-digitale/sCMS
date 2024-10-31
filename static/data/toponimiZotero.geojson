@@ -108,7 +108,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Molossia",
+        "name": "@Molossia",
         "altLabel": "Molosia",
         "broader": "Epirus"
       },
@@ -136,7 +136,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Butrint",
+        "name": "@Butrint",
         "altLabel": "Butrinti, Butrinto, Bouthrotos, Butrint",
         "broader": "Chaonia"
       },
@@ -148,7 +148,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Phoinike",
+        "name": "@Phoinike",
         "altLabel": "Foinike,  Fenice,  Phoenice,  Finiq, Finiqi",
         "broader": "Chaonia"
       },
@@ -160,7 +160,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Gramata",
+        "name": "@Gramata",
         "altLabel": "Grammata",
         "broader": "Chaonia"
       },
@@ -172,7 +172,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Saranda",
+        "name": "@Saranda",
         "altLabel": "Onchesmos, Anchiasmos, Ankiasmi, Onhesmi, Santi Quaranta, Porto Edda",
         "broader": "Chaonia"
       },
@@ -184,7 +184,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Malathrea",
+        "name": "@Malathrea",
         "altLabel": "Malathre, Amaltheion",
         "broader": null
       },
