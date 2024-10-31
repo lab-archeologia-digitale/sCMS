@@ -1,0 +1,89 @@
+---
+title: "MapLibre: Adding a vector layer from EDR Epigraphic Database Roma"
+date: "2024-10-01"
+slug: "maps/examples/maplibre-edr-map2onto"
+description: "MapLibre: Adding a vector layer from EDR Epigraphic Database Roma"
+---
+
+import { MapCompLibre, VectorLayerLibre } from "../../../modules/scms.js"
+
+### MapLibre: Adding a vector layer from EDR Epigraphic Database Roma
+
+<div className="row mt-3 mb-5 border-top border-bottom py-3">
+  <div className="col-6">
+    <MapCompLibre 
+      center="37.00416,37.48551,9"
+      baseLayers={["EsriSatellite", "CAWM"]}
+    >
+      <VectorLayerLibre
+        name="Epigrafi"
+        source={{
+          dEndPoint: "https://landscapearchaeology.eu/carafa/items/edr_epigrafi",
+          dToken: "sf_1HmCNdbos1ttKyPhJZPfr75GZhNxK",
+          dataOnto: "/data/toponimiINROME.geojson",
+        }}
+        checked={true}
+        fitToContent={false}
+        searchInFields={{
+          "name": "name",
+          "altLabel": "altLabel",
+        }}
+        style={{
+          id: "epigrafiSites",
+          type: "circle",
+          paint: {
+            "circle-radius": 14,
+            "circle-color": "#007cbf",
+            "circle-stroke-width": 1.5,
+            "circle-stroke-color": "#000000"
+          },
+        }}
+        popupTemplate="<h4>${name}</h4><p>${altLabel}</p><ul>${epiList}</ul>"
+      />
+    
+    </MapCompLibre>
+    Data from [EDR] (http://www.edr-edr.it/edr_programmi/edr_api.php?ancient_city=roma)
+
+  </div>
+  <div className="col-6">
+    ```jsx
+    import {
+      MapCompLibre,
+      VectorLayerLibre
+    } from "../../../modules/scms.js"
+
+    <MapCompLibre
+      center="37.00416,37.48551,9"
+      baseLayers={["EsriSatellite", "CAWM"]}
+    >
+      <VectorLayerLibre
+        name="Epigrafi"
+        source={{
+          dEndPoint: "http://www.edr-edr.it/edr_programmi/edr_api.php?ancient_city=roma",
+          dataOnto: "/data/toponimiINROME.geojson",
+        }}
+        checked={true}
+        fitToContent={false}
+        searchInFields={{
+          "name": "name",
+          "altLabel": "altLabel",
+        }}
+        style={{
+          id: "epigrafiSites",
+          type: "circle",
+          paint: {
+            "circle-radius": 14,
+            "circle-color": "#007cbf",
+            "circle-stroke-width": 1.5,
+            "circle-stroke-color": "#000000"
+          },
+        }}
+        popupTemplate="<h4>${name}</h4><p>${altLabel}</p><ul>${epiList}</ul>"
+      />
+
+
+    </MapCompLibre>
+    ```
+
+  </div>
+</div>

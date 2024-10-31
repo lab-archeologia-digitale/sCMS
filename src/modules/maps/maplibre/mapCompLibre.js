@@ -43,9 +43,9 @@ const MapCompLibre = ({
     // Usa map per scorrere i layer e filtrare quelli con metadata.popupTemplate
     const dynamicInteractiveLayers = mapInstance
       .getStyle()
-      .layers.map(layer =>
-        layer.metadata && layer.metadata.popupTemplate ? layer.id : null,
-      )
+      .layers.map(layer => {
+        return layer.metadata && layer.metadata.popupTemplate ? layer.id : null
+      })
       .filter(Boolean) // Rimuove i valori null
 
     // Salva i layer interattivi nella variabile di riferimento
@@ -86,7 +86,11 @@ const MapCompLibre = ({
           zoom: zoom,
         }}
         style={{ height: height ? height : `800px` }}
-        mapStyle={mapStyle && mapStyle.startsWith('http') ? mapStyle : withPrefix(mapStyle)}
+        mapStyle={
+          mapStyle && mapStyle.startsWith("http")
+            ? mapStyle
+            : withPrefix(mapStyle)
+        }
         onLoad={onMapLoad}
         onClick={onClick}
       >

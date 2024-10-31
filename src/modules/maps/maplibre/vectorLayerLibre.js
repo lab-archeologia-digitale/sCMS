@@ -67,14 +67,13 @@ const VectorLayerLibre = ({
 
   const fitLayerToBounds = useCallback(() => {
     if (mapRef && geojsonData && fitToContent) {
+      console.log("Dati GeoJSON per il calcolo di bbox:", geojsonData) // Verifica struttura prima di bbox
       const mapInstance = mapRef.getMap()
       const [minLng, minLat, maxLng, maxLat] = bbox(geojsonData)
-      mapInstance.fitBounds(
-        [
-          [minLng, minLat],
-          [maxLng, maxLat],
-        ]
-      )
+      mapInstance.fitBounds([
+        [minLng, minLat],
+        [maxLng, maxLat],
+      ])
     }
   }, [mapRef, geojsonData, fitToContent])
 
@@ -84,11 +83,11 @@ const VectorLayerLibre = ({
       fitLayerToBounds()
     }
   }, [mapRef, updateLayerStyle, fitLayerToBounds])
-  
+
   useEffect(() => {
     const fetchGeoData = async () => {
       try {
-        source.transType = "geojson";
+        source.transType = "geojson"
         const geoJSON = await getDataFromSource(source)
         setGeojson(geoJSON) // Imposta i dati geoJSON originali
       } catch (err) {
@@ -96,11 +95,9 @@ const VectorLayerLibre = ({
         setError("Errore nel caricamento dei dati")
       }
     }
-    if (!refId){
+    if (!refId) {
       fetchGeoData() // Carica i dati quando il componente è montato
     }
-    
-
   }, [refId, source])
 
   if (error) {
@@ -120,7 +117,6 @@ const VectorLayerLibre = ({
 }
 
 VectorLayerLibre.propTypes = {
-
   source: sourcePropTypes,
 
   /**
