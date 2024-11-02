@@ -125,6 +125,11 @@ function edr2Onto(edrData, geoData) {
       }
     }
 
+    // Aggiungi il numero di epigrafi come nuova proprietà
+    for (const mapEl of toponimi.features) {
+      mapEl.properties.numEpigrafi = mapEl.properties.epigrafi.length
+    }
+
     const result = {
       ...toponimi,
       features: toponimi.features.filter(

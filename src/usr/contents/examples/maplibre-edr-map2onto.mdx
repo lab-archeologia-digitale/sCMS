@@ -12,9 +12,10 @@ import { MapCompLibre, VectorLayerLibre } from "../../../modules/scms.js"
 <div className="row mt-3 mb-5 border-top border-bottom py-3">
   <div className="col-6">
     <MapCompLibre 
-      center="37.00416,37.48551,9"
+      center="12.492439,41.890064,9"
       baseLayers={["EsriSatellite", "CAWM"]}
     >
+    
       <VectorLayerLibre
         name="Epigrafi"
         source={{
@@ -38,7 +39,7 @@ import { MapCompLibre, VectorLayerLibre } from "../../../modules/scms.js"
             "circle-stroke-color": "#FFF"
           },
         }}
-        popupTemplate="<h4>${nome}</h4><p>${altLabel}</p><ul>${epiList}</ul>"
+        popupTemplate="<h4>${nome} (${numEpigrafi})</h4><p>${altLabel}</p><ul>${epiList}</ul>"
       />
     
     </MapCompLibre>
@@ -53,7 +54,7 @@ import { MapCompLibre, VectorLayerLibre } from "../../../modules/scms.js"
     } from "../../../modules/scms.js"
 
     <MapCompLibre
-      center="37.00416,37.48551,9"
+         center="12.492439,41.890064,9"
       baseLayers={["EsriSatellite", "CAWM"]}
     >
       <VectorLayerLibre
@@ -78,7 +79,7 @@ import { MapCompLibre, VectorLayerLibre } from "../../../modules/scms.js"
             "circle-stroke-color": "#FFF"
           },
         }}
-        popupTemplate="<h4>${name}</h4><p>${altLabel}</p><ul>${epiList}</ul>"
+        popupTemplate="<h4>${nome}</h4><p>${altLabel}</p><ul>${epiList}</ul>"
       />
 
 
