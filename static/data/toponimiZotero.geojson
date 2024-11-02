@@ -5,7 +5,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Chaonia",
+        "name": "@Chaonia",
         "altLabel": "Kaonia, Caonia",
         "broader": "Epirus"
       },
@@ -37,7 +37,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Cestrine",
+        "name": "@Cestrine",
         "altLabel": "Kestrine",
         "broader": "Chaonia, Thesprotia"
       },
@@ -69,7 +69,7 @@
       "type": "Feature",
       "id": 2,
       "properties": {
-        "name": "Çuka e Ajtoit",
+        "name": "@Çuka e Ajtoit",
         "altLabel": "Cestria, Monte Aetòs, Monte Aetos",
         "broader": "Cestrine"
       },
@@ -81,7 +81,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Thesprotia",
+        "name": "@Thesprotia",
         "altLabel": "Tesprozia",
         "broader": "Epirus"
       },
