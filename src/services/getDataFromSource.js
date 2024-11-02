@@ -26,7 +26,7 @@ const getDataFromSource = async source => {
   let output
 
   // Caso ZoteroGroup e dataOnto
-
+  // TODO: è chiaramente una prima bozza, ma questo non andrebbe collocato qui, ma spostato come un transformer service!
   if (zoteroGroup && dataOnto) {
     try {
       //console.log("Inizio recupero dati Zotero...")
