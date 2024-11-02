@@ -55,7 +55,6 @@
 { "type": "Feature", "properties": { "id": 1341, "nome": "Catacombe di Domitilla", "altLabel": null }, "geometry": { "type": "Point", "coordinates": [ 12.505645520659765, 41.858815190809693 ] } },
 { "type": "Feature", "properties": { "id": 1342, "nome": "Tomba di Cecilia Metella", "altLabel": null }, "geometry": { "type": "Point", "coordinates": [ 12.520886391800719, 41.851930117510328 ] } },
 { "type": "Feature", "properties": { "id": 1343, "nome": "Casale dell'Ara", "altLabel": null }, "geometry": { "type": "Point", "coordinates": [ 12.472276733683509, 41.801963079352205 ] } },
-{ "type": "Feature", "properties": { "id": 1347, "nome": "test", "altLabel": null }, "geometry": { "type": "Point", "coordinates": [ 12.67410278320466, 41.747250899316157 ] } },
 { "type": "Feature", "properties": { "id": 1349, "nome": "Piano di Coste Rotonde", "altLabel": null }, "geometry": { "type": "Point", "coordinates": [ 12.622254772069491, 41.773233869905631 ] } },
 { "type": "Feature", "properties": { "id": 1350, "nome": "Tor Ser Paolo", "altLabel": null }, "geometry": { "type": "Point", "coordinates": [ 12.628805439663022, 41.773502298171238 ] } },
 { "type": "Feature", "properties": { "id": 1351, "nome": "Villa Castrucci", "altLabel": null }, "geometry": { "type": "Point", "coordinates": [ 12.63391040131329, 41.775202317766656 ] } },
