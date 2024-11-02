@@ -82,15 +82,16 @@ const getDataFromSource = async source => {
       console.log("Contenuto di output.features con epigrafi:", output.features)
 
       output.features.forEach(feature => {
-        feature.properties.epigrafi =
-          feature.properties.epigrafi && feature.properties.epigrafi.length > 0
-            ? feature.properties.epigrafi
-                .map(
-                  item =>
-                    `<li>${item.title}: <strong>${item.discovery}</strong></li>`,
-                )
-                .join("")
-            : "<li>No Epigraphy available</li>"
+        if (feature.properties.epigrafi) {
+          feature.properties.epiList = feature.properties.epigrafi
+            .map(
+              item =>
+                `<li>${item.title}: <strong>${item.discovery}</strong></li>`,
+            )
+            .join("")
+        } else {
+          feature.properties.epiList = "<li>No Epigraphy available</li>"
+        }
       })
 
       return output
