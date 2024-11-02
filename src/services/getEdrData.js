@@ -21,13 +21,15 @@ const getEdrData = async (dEndPoint, dToken) => {
       allResults = allResults.concat(data.data) // Aggiunge i risultati
       start += data.data.length
 
-      console.log(`Risultati accumulati: ${allResults.length}`)
+      //console.log(`Risultati accumulati: ${allResults.length}`)
     } catch (error) {
       console.error("Errore durante la richiesta di dati Directus:", error)
       break
     }
   }
-
+  console.log(
+    `Caricamento completato. Numero totale di risultati: ${allResults.length}`,
+  )
   return allResults
 }
 

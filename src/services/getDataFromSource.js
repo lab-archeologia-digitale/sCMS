@@ -71,28 +71,26 @@ const getDataFromSource = async source => {
   // Caso edrAPI e dataOnto
   if (dEndPoint && dataOnto) {
     try {
+      const geoDataInrome = await fetch(dataOnto).then(res => res.json())
+      console.log("Controllo dettagliato di geoData:", geoDataInrome)
+
       const edrData = await getEdrData(dEndPoint, dToken)
-      console.log("Dati non geografici (edr) recuperati (edrData):", edrData)
-      // Fetch di geoData da dataOnto
-      const geoData = await fetch(dataOnto).then(res => res.json())
-      console.log("Dati geografici (GeoJSON) recuperati (geoData):", geoData)
+      console.log("Dati non geografici (edrData) recuperati:", edrData)
 
-      let edrGeoData = geoField ? json2geoJson(edrData, geoField) : edrData
-
-      // Mapping dei dati
-      output = edr2Onto(edrGeoData, geoData)
+      output = edr2Onto(edrData, geoDataInrome)
       console.log("Output mappato dopo edr2Onto:", output)
+      console.log("Contenuto di output.features con epigrafi:", output.features)
 
-      // Creazione di epiList
       output.features.forEach(feature => {
-        feature.properties.epiList = feature.properties.epigrafi
-          ? feature.properties.epigrafi
-              .map(
-                item =>
-                  `<li>${item.discovery_location}: <strong>${item.title}</strong></li>`,
-              )
-              .join("")
-          : "<li>No Epigraphy available</li>"
+        feature.properties.epigrafi =
+          feature.properties.epigrafi && feature.properties.epigrafi.length > 0
+            ? feature.properties.epigrafi
+                .map(
+                  item =>
+                    `<li>${item.title}: <strong>${item.discovery}</strong></li>`,
+                )
+                .join("")
+            : "<li>No Epigraphy available</li>"
       })
 
       return output

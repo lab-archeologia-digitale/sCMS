@@ -25,20 +25,20 @@ import { MapCompLibre, VectorLayerLibre } from "../../../modules/scms.js"
         checked={true}
         fitToContent={false}
         searchInFields={{
-          "name": "name",
+          "name": "nome",
           "altLabel": "altLabel",
         }}
         style={{
           id: "epigrafiSites",
           type: "circle",
           paint: {
-            "circle-radius": 14,
-            "circle-color": "#007cbf",
+            "circle-radius": 7,
+            "circle-color": "#000",
             "circle-stroke-width": 1.5,
-            "circle-stroke-color": "#000000"
+            "circle-stroke-color": "#FFF"
           },
         }}
-        popupTemplate="<h4>${name}</h4><p>${altLabel}</p><ul>${epiList}</ul>"
+        popupTemplate="<h4>${nome}</h4><p>${altLabel}</p><ul>${epiList}</ul>"
       />
     
     </MapCompLibre>
@@ -65,17 +65,17 @@ import { MapCompLibre, VectorLayerLibre } from "../../../modules/scms.js"
         checked={true}
         fitToContent={false}
         searchInFields={{
-          "name": "name",
+          "name": "nome",
           "altLabel": "altLabel",
         }}
         style={{
           id: "epigrafiSites",
           type: "circle",
           paint: {
-            "circle-radius": 14,
-            "circle-color": "#007cbf",
+            "circle-radius": 7,
+            "circle-color": "#000",
             "circle-stroke-width": 1.5,
-            "circle-stroke-color": "#000000"
+            "circle-stroke-color": "#FFF"
           },
         }}
         popupTemplate="<h4>${name}</h4><p>${altLabel}</p><ul>${epiList}</ul>"
