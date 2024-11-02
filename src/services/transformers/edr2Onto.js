@@ -5,17 +5,20 @@ function edr2Onto(edrData, geoData) {
     return null
   }
 
-  // Funzione per creare un oggetto basato sulla proprietà "nome"
+  // Funzione per creare un oggetto basato sulla proprietà "nome" del toponimo
   function returnTopo(features) {
     const ret = {}
     features.forEach(item => {
-      const nome = item.properties.nome?.toLowerCase()
+      const nome = item.properties.nome?.toLowerCase().trim()
       if (nome) ret[nome] = item.properties
 
       const altLabel = item.properties.altLabel
       if (altLabel) {
         altLabel.split(",").forEach(label => {
-          ret[label.trim().toLowerCase()] = item.properties
+          const trimmedLabel = label.trim().toLowerCase()
+          if (trimmedLabel) {
+            ret[trimmedLabel] = item.properties
+          }
         })
       }
     })
@@ -23,69 +26,122 @@ function edr2Onto(edrData, geoData) {
   }
 
   const topo = returnTopo(geoData.features)
+  //console.log("Toponimi elaborati (topo):", topo)
 
-  // Funzione per aggiungere il match
   function addMatchEdr(item, topo, discoveryLoc = "") {
-    if (typeof discoveryLoc !== "string") return
-    if (!item.match) item.match = []
+    if (typeof discoveryLoc !== "string" || !discoveryLoc.trim()) {
+      console.warn("Formato discovery_location non valido:", discoveryLoc)
+      return
+    }
 
+    const matches = []
     Object.keys(topo).forEach(word => {
       if (discoveryLoc.toLowerCase().includes(word)) {
-        item.match.push(word)
+        matches.push(word)
       }
     })
+
+    if (matches.length > 0) {
+      item.match = matches // Aggiunge la proprietà 'match' solo se c'è almeno un match
+    }
   }
 
   // Mappatura delle epigrafi per blocchi
   function parseEDR(edr, topo, blockSize = 500) {
     const matched = []
+    // let analyzedLocations = 0
+
     for (let i = 0; i < edr.length; i += blockSize) {
       const block = edr.slice(i, i + blockSize)
       block.forEach(item => {
-        if (item.localization?.discovery_location) {
-          addMatchEdr(item, topo, item.localization.discovery_location)
+        const discoveryLoc = item.discovery_location // Accesso diretto
+
+        if (discoveryLoc) {
+          //  analyzedLocations++
+          addMatchEdr(item, topo, discoveryLoc)
+
           if (item.match && item.match.length > 0) {
             matched.push(item)
-            console.log("Match trovato:", item.match) // Log per corrispondenze
           }
+        } else {
+          console.warn("discovery_location mancante per item:", item)
         }
       })
-      console.log(`Processato blocco ${i / blockSize + 1}`)
+      //console.log(`Processato blocco ${i / blockSize + 1}`)
     }
+
+    //console.log(
+    //  `Numero totale di discovery_location analizzate: ${analyzedLocations}`,
+    //)
+    //console.log(
+    //  "EDR data con la proprietà match:",
+    //  edr.filter(item => item.match && item.match.length > 0),
+    //)
     return matched
   }
 
   const edrMatch = parseEDR(edrData, topo)
 
+  // Funzione per mappare le epigrafi corrispondenti sui toponimi
   function mapEdr(edrMatch, toponimi) {
-    toponimi.features = toponimi.features.filter(mapEl => {
-      mapEl.properties.epiList = []
+    for (const mapEl of toponimi.features) {
+      if (!mapEl.properties.hasOwnProperty("epigrafi")) {
+        mapEl.properties.epigrafi = []
+      }
+    }
 
-      edrMatch.forEach(edrItem => {
+    for (const edrItem of edrMatch) {
+      if (edrItem?.match.length) {
         edrItem.match.forEach(m => {
-          if (
-            mapEl.properties.nome.toLowerCase() === m ||
-            mapEl.properties.altLabel
-              ?.toLowerCase()
-              .split(",")
-              .some(label => label.trim() === m)
-          ) {
-            const recordNumber = edrItem.identification.record_number
-            if (
-              !mapEl.properties.epiList.some(epi => epi.title === recordNumber)
-            ) {
-              mapEl.properties.epiList.push({
-                title: recordNumber,
-                url: edrItem.identification.url,
-                discovery: edrItem.localization.discovery_location,
-              })
+          for (const mapEl of toponimi.features) {
+            const nomeMatch =
+              mapEl.properties.nome &&
+              mapEl.properties.nome.trim().toLowerCase() ===
+                m.trim().toLowerCase()
+
+            const altLabelMatch =
+              mapEl.properties.altLabel &&
+              mapEl.properties.altLabel
+                .split(",")
+                .map(label => label.trim().toLowerCase())
+                .includes(m.trim().toLowerCase())
+
+            if (nomeMatch || altLabelMatch) {
+              const recordNumber = edrItem.record_number
+              if (
+                !mapEl.properties.epigrafi.some(
+                  epigrafi => epigrafi.title === recordNumber,
+                )
+              ) {
+                mapEl.properties.epigrafi.push({
+                  title: edrItem.record_number,
+                  url: edrItem.url,
+                  discovery: edrItem.discovery_location,
+                })
+              }
             }
           }
         })
-      })
-      return mapEl.properties.epiList.length > 0
-    })
-    return toponimi
+      }
+    }
+
+    // Aggiungi il numero di epigrafi come nuova proprietà
+    for (const mapEl of toponimi.features) {
+      mapEl.properties.numEpigrafi = mapEl.properties.epigrafi.length
+    }
+
+    const result = {
+      ...toponimi,
+      features: toponimi.features.filter(
+        feature => feature.properties.epigrafi.length > 0,
+      ),
+    }
+
+    // console.log(
+    //  "Numero di toponimi con epigrafi corrispondenti:",
+    //  result.features.length,
+    // )
+    return result
   }
 
   return mapEdr(edrMatch, geoData)

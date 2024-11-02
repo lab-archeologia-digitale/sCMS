@@ -29,16 +29,11 @@ const getDataFromSource = async source => {
   // TODO: è chiaramente una prima bozza, ma questo non andrebbe collocato qui, ma spostato come un transformer service!
   if (zoteroGroup && dataOnto) {
     try {
-      //console.log("Inizio recupero dati Zotero...")
       const nonGeoData = await getDataZotero(zoteroGroup)
-      //console.log("Dati Zotero recuperati:", nonGeoData)
-
       const geoData = await fetch(dataOnto).then(res => res.json())
-      console.log("Dati geografici (GeoJSON) recuperati:", geoData)
 
       // Applica il mapping con map2Onto
       output = map2Onto(nonGeoData, geoData)
-      // console.log("Output mappato (output):", output)
 
       // Creazione del campo `biblioList` in formato HTML per ogni feature
       output.features.forEach(feature => {
@@ -58,9 +53,7 @@ const getDataFromSource = async source => {
       output.features = output.features.filter(
         feature => feature.geometry.type === "Point",
       )
-
-      //console.log("Output finale con solo punti (da Zotero):", output)
-      return output // Restituisce il GeoJSON mappato con solo i punti
+      return output
     } catch (error) {
       throw new Error(
         "Errore durante il recupero o il mapping dei dati Zotero: " + error,
@@ -71,28 +64,23 @@ const getDataFromSource = async source => {
   // Caso edrAPI e dataOnto
   if (dEndPoint && dataOnto) {
     try {
+      const geoDataInrome = await fetch(dataOnto).then(res => res.json())
+
       const edrData = await getEdrData(dEndPoint, dToken)
-      console.log("Dati non geografici (edr) recuperati (edrData):", edrData)
-      // Fetch di geoData da dataOnto
-      const geoData = await fetch(dataOnto).then(res => res.json())
-      console.log("Dati geografici (GeoJSON) recuperati (geoData):", geoData)
 
-      let edrGeoData = geoField ? json2geoJson(edrData, geoField) : edrData
+      output = edr2Onto(edrData, geoDataInrome)
 
-      // Mapping dei dati
-      output = edr2Onto(edrGeoData, geoData)
-      console.log("Output mappato dopo edr2Onto:", output)
-
-      // Creazione di epiList
       output.features.forEach(feature => {
-        feature.properties.epiList = feature.properties.epigrafi
-          ? feature.properties.epigrafi
-              .map(
-                item =>
-                  `<li>${item.discovery_location}: <strong>${item.title}</strong></li>`,
-              )
-              .join("")
-          : "<li>No Epigraphy available</li>"
+        if (feature.properties.epigrafi) {
+          feature.properties.epiList = feature.properties.epigrafi
+            .map(
+              item =>
+                `<li>${item.title}: <strong>${item.discovery}</strong></li>`,
+            )
+            .join("")
+        } else {
+          feature.properties.epiList = "<li>No Epigraphy available</li>"
+        }
       })
 
       return output

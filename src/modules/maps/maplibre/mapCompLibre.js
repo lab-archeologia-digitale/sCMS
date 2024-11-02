@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useState, useCallback, useRef } from "react"
+import { useState, useCallback, useEffect, useRef } from "react"
 import "maplibre-gl/dist/maplibre-gl.css"
 import Map, {
   NavigationControl,
@@ -32,25 +32,75 @@ const MapCompLibre = ({
 
   const [clickInfo, setClickInfo] = useState(null)
   const interactiveLayersRef = useRef([])
+  const mapInstanceRef = useRef(null)
 
-  const onMapLoad = useCallback(event => {
-    const mapInstance = event.target
+  const updateInteractiveLayers = useCallback(() => {
+    if (!mapInstanceRef.current) {
+      console.warn(
+        "mapInstanceRef.current è null, impossibile aggiornare i layer.",
+      )
+      return
+    }
 
-    // test custom control
-    const customControl = new SimpleControl()
-    mapInstance.addControl(customControl, "top-right")
-
-    // Usa map per scorrere i layer e filtrare quelli con metadata.popupTemplate
-    const dynamicInteractiveLayers = mapInstance
-      .getStyle()
-      .layers.map(layer => {
-        return layer.metadata && layer.metadata.popupTemplate ? layer.id : null
+    // Log per vedere tutti i layer presenti nella mappa
+    const allLayers = mapInstanceRef.current.getStyle().layers
+    const dynamicInteractiveLayers = allLayers
+      .map(layer => {
+        if (layer.metadata && layer.metadata.popupTemplate) {
+          console.log(`Layer interattivo trovato: ${layer.id}`)
+          return layer.id
+        }
+        return null
       })
-      .filter(Boolean) // Rimuove i valori null
+      .filter(Boolean)
 
-    // Salva i layer interattivi nella variabile di riferimento
+    if (dynamicInteractiveLayers.length === 0) {
+      console.warn(
+        "Nessun layer interattivo trovato con metadata.popupTemplate.",
+      )
+    }
+
     interactiveLayersRef.current = dynamicInteractiveLayers
   }, [])
+
+  const onMapLoad = useCallback(
+    event => {
+      const mapInstance = event.target
+      mapInstanceRef.current = mapInstance // Salva l'istanza della mappa
+
+      // test custom control
+      const customControl = new SimpleControl()
+      mapInstance.addControl(customControl, "top-right")
+
+      // Aggiungi un listener per aggiornare i layer interattivi quando vengono aggiunti nuovi source o layer
+      mapInstance.on("sourcedata", updateInteractiveLayers)
+      mapInstance.on("styledata", updateInteractiveLayers)
+    },
+    [updateInteractiveLayers],
+  )
+
+  useEffect(() => {
+    if (!mapInstanceRef.current) return
+
+    mapInstanceRef.current.on("sourcedata", updateInteractiveLayers)
+    mapInstanceRef.current.on("styledata", updateInteractiveLayers)
+
+    // Cleanup quando il componente viene smontato
+    return () => {
+      mapInstanceRef.current.off("sourcedata", updateInteractiveLayers)
+      mapInstanceRef.current.off("styledata", updateInteractiveLayers)
+    }
+  }, [updateInteractiveLayers])
+
+  const addNewLayer = useCallback(
+    layer => {
+      if (!mapInstanceRef.current) return
+
+      mapInstanceRef.current.addLayer(layer)
+      updateInteractiveLayers() // Aggiorna l'array dei layer interattivi dopo l'aggiunta
+    },
+    [updateInteractiveLayers],
+  )
 
   const onClick = useCallback(event => {
     const { lngLat, point } = event
@@ -136,71 +186,35 @@ const MapCompLibre = ({
     </React.Fragment>
   )
 }
+
 MapCompLibre.propTypes = {
-  /**
-   * Height (with units) of the map to render
-   * Optional. Default: "800px"
-   */
   height: PropTypes.string,
-  /**
-   * Center of the initial map, in the shape of long,lat,zoom (string, comma-separated)
-   * Optional. Default: "0,0,2"
-   */
   center: PropTypes.string,
-  /**
-   * URL of the JSON mapstyle file
-   * Optional. Default: null
-   */
   mapStyle: PropTypes.string,
-  /**
-   * Position in the map frame of the Geolocate Control. If not provided, the Geolocate Controle will not be shown
-   * Can be one of the following: "top-right", "top-left", "bottom-right", "bottom-left"
-   * Default: false
-   */
   geolocateControl: PropTypes.oneOf([
     "top-right",
     "top-left",
     "bottom-right",
     "bottom-left",
   ]),
-  /**
-   * Position in the map frame of the Fullscreen Control. If not provided, the Fullscreen Controle will not be shown
-   * Can be one of the following: "top-right", "top-left", "bottom-right", "bottom-left"
-   * Default: false
-   */
   fullscreenControl: PropTypes.oneOf([
     "top-right",
     "top-left",
     "bottom-right",
     "bottom-left",
   ]),
-  /**
-   * Position in the map frame of the Navigation Control. If not provided, the Navigation Controle will not be shown
-   * Can be one of the following: "top-right", "top-left", "bottom-right", "bottom-left"
-   * Default: false
-   */
   navigationControl: PropTypes.oneOf([
     "top-right",
     "top-left",
     "bottom-right",
     "bottom-left",
   ]),
-  /**
-   * Position in the map frame of the Scale Control. If not provided, the Scale Controle will not be shown
-   * Can be one of the following: "top-right", "top-left", "bottom-right", "bottom-left"
-   * Default: false
-   */
   scaleControl: PropTypes.oneOf([
     "top-right",
     "top-left",
     "bottom-right",
     "bottom-left",
   ]),
-  /**
-   * An adday with the identifiers of the default raster base layers to show in the map.
-   * Can be one or more of the following: "CAWM", "OSM", "EsriSatellite","EsriStreets", "EsriTopo", "GoogleSatellite", "GoogleRoadmap", "GoogleTerrain", "GoogleAlteredRoadmap", "GoogleTerrainOnly", "GoogleHybrid", "CartoDb", "StamenTerrain", "OSMMapnick", "OSMCycle",
-   * Default: null
-   */
   baseLayers: PropTypes.arrayOf(
     PropTypes.oneOf([
       "CAWM",
