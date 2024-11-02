@@ -29,16 +29,11 @@ const getDataFromSource = async source => {
 
   if (zoteroGroup && dataOnto) {
     try {
-      //console.log("Inizio recupero dati Zotero...")
       const nonGeoData = await getDataZotero(zoteroGroup)
-      //console.log("Dati Zotero recuperati:", nonGeoData)
-
       const geoData = await fetch(dataOnto).then(res => res.json())
-      console.log("Dati geografici (GeoJSON) recuperati:", geoData)
 
       // Applica il mapping con map2Onto
       output = map2Onto(nonGeoData, geoData)
-      // console.log("Output mappato (output):", output)
 
       // Creazione del campo `biblioList` in formato HTML per ogni feature
       output.features.forEach(feature => {
@@ -58,9 +53,7 @@ const getDataFromSource = async source => {
       output.features = output.features.filter(
         feature => feature.geometry.type === "Point",
       )
-
-      //console.log("Output finale con solo punti (da Zotero):", output)
-      return output // Restituisce il GeoJSON mappato con solo i punti
+      return output
     } catch (error) {
       throw new Error(
         "Errore durante il recupero o il mapping dei dati Zotero: " + error,
@@ -72,14 +65,10 @@ const getDataFromSource = async source => {
   if (dEndPoint && dataOnto) {
     try {
       const geoDataInrome = await fetch(dataOnto).then(res => res.json())
-      console.log("Controllo dettagliato di geoData:", geoDataInrome)
 
       const edrData = await getEdrData(dEndPoint, dToken)
-      console.log("Dati non geografici (edrData) recuperati:", edrData)
 
       output = edr2Onto(edrData, geoDataInrome)
-      console.log("Output mappato dopo edr2Onto:", output)
-      console.log("Contenuto di output.features con epigrafi:", output.features)
 
       output.features.forEach(feature => {
         if (feature.properties.epigrafi) {

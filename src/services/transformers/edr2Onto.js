@@ -26,7 +26,7 @@ function edr2Onto(edrData, geoData) {
   }
 
   const topo = returnTopo(geoData.features)
-  console.log("Toponimi elaborati (topo):", topo)
+  //console.log("Toponimi elaborati (topo):", topo)
 
   function addMatchEdr(item, topo, discoveryLoc = "") {
     if (typeof discoveryLoc !== "string" || !discoveryLoc.trim()) {
@@ -49,7 +49,7 @@ function edr2Onto(edrData, geoData) {
   // Mappatura delle epigrafi per blocchi
   function parseEDR(edr, topo, blockSize = 500) {
     const matched = []
-    let analyzedLocations = 0
+    // let analyzedLocations = 0
 
     for (let i = 0; i < edr.length; i += blockSize) {
       const block = edr.slice(i, i + blockSize)
@@ -57,7 +57,7 @@ function edr2Onto(edrData, geoData) {
         const discoveryLoc = item.discovery_location // Accesso diretto
 
         if (discoveryLoc) {
-          analyzedLocations++
+          //  analyzedLocations++
           addMatchEdr(item, topo, discoveryLoc)
 
           if (item.match && item.match.length > 0) {
@@ -67,16 +67,16 @@ function edr2Onto(edrData, geoData) {
           console.warn("discovery_location mancante per item:", item)
         }
       })
-      console.log(`Processato blocco ${i / blockSize + 1}`)
+      //console.log(`Processato blocco ${i / blockSize + 1}`)
     }
 
-    console.log(
-      `Numero totale di discovery_location analizzate: ${analyzedLocations}`,
-    )
-    console.log(
-      "EDR data con la proprietà match:",
-      edr.filter(item => item.match && item.match.length > 0),
-    )
+    //console.log(
+    //  `Numero totale di discovery_location analizzate: ${analyzedLocations}`,
+    //)
+    //console.log(
+    //  "EDR data con la proprietà match:",
+    //  edr.filter(item => item.match && item.match.length > 0),
+    //)
     return matched
   }
 
@@ -132,10 +132,10 @@ function edr2Onto(edrData, geoData) {
       ),
     }
 
-    console.log(
-      "Numero di toponimi con epigrafi corrispondenti:",
-      result.features.length,
-    )
+    // console.log(
+    //  "Numero di toponimi con epigrafi corrispondenti:",
+    //  result.features.length,
+    // )
     return result
   }
 

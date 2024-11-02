@@ -35,8 +35,6 @@ const MapCompLibre = ({
   const mapInstanceRef = useRef(null)
 
   const updateInteractiveLayers = useCallback(() => {
-    console.log("Tentativo di aggiornamento dei layer interattivi...")
-
     if (!mapInstanceRef.current) {
       console.warn(
         "mapInstanceRef.current è null, impossibile aggiornare i layer.",
@@ -46,8 +44,6 @@ const MapCompLibre = ({
 
     // Log per vedere tutti i layer presenti nella mappa
     const allLayers = mapInstanceRef.current.getStyle().layers
-    console.log("Tutti i layer nella mappa:", allLayers)
-
     const dynamicInteractiveLayers = allLayers
       .map(layer => {
         if (layer.metadata && layer.metadata.popupTemplate) {
@@ -65,10 +61,6 @@ const MapCompLibre = ({
     }
 
     interactiveLayersRef.current = dynamicInteractiveLayers
-    console.log(
-      "Aggiornato interactiveLayersRef:",
-      interactiveLayersRef.current,
-    )
   }, [])
 
   const onMapLoad = useCallback(
