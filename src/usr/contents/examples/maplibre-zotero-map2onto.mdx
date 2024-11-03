@@ -18,7 +18,7 @@ import { MapCompLibre, VectorLayerLibre } from "../../../modules/scms.js"
         name="Zotero Point"
         source={{
           zoteroGroup: "336647",
-          dataOnto: "/data/toponimiZotero.geojson"
+          dataOnto: "/data/toponimiZotero_point.geojson"
         }}
         checked={true}
         fitToContent={true}
@@ -79,7 +79,7 @@ import { MapCompLibre, VectorLayerLibre } from "../../../modules/scms.js"
         name="Zotero Point"
         source={{
           zoteroGroup: "336647",
-          dataOnto: "/data/toponimiZotero.geojson"
+          dataOnto: "/data/toponimiZotero_polygon.geojson"
         }}
         checked={true}
         fitToContent={true}
@@ -104,6 +104,27 @@ import { MapCompLibre, VectorLayerLibre } from "../../../modules/scms.js"
         name="Zotero Areas"
         source={{
           zoteroGroup: "336647",
+          dataOnto: "/data/toponimiZotero_point.geojson"
+        }}
+        checked={false}
+        fitToContent={true}
+        searchInFields={{
+          "name": "name",
+          "altLabel": "altLabel",
+        }}
+        style={{
+          type: "fill",
+          paint: {
+            "fill-color": "#ff0000",
+            "fill-opacity": 0.5
+          },
+        }}
+        popupTemplate="<h4>${name}</h4><p>${altLabel}</p><ul>${biblioList}</ul>"
+      />
+      <VectorLayerLibre
+        name="Zotero Areas"
+        source={{
+          zoteroGroup: "336647",
           dataOnto: "/data/toponimiZotero.geojson"
         }}
         checked={false}
@@ -121,7 +142,6 @@ import { MapCompLibre, VectorLayerLibre } from "../../../modules/scms.js"
         }}
         popupTemplate="<h4>${name}</h4><p>${altLabel}</p><ul>${biblioList}</ul>"
       />
-
     </MapCompLibre>
     ```
 
