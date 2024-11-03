@@ -49,10 +49,6 @@ const getDataFromSource = async source => {
         }
       })
 
-      // Filtra le feature per mantenere solo i punti (geometry.type === "Point") solo se provengono da Zotero
-      output.features = output.features.filter(
-        feature => feature.geometry.type === "Point",
-      )
       return output
     } catch (error) {
       throw new Error(
