@@ -1,6 +1,6 @@
 /**
  *
- * @param {Array} features Array of ontology (GeoJSON) features
+ * @param {Array} features: Array of ontology (GeoJSON) featurtes
  * @returns {Object} Object containing (only) properties of each feature.
  *                   The name property is used as index
  *                    e.g.: { "Chaonia": {"name": "Chaonia", "altLabel": "Kaonia, Caonia", "broader": "Epirus"}, ...
@@ -8,20 +8,26 @@
 function returnVoc(features) {
   const ret = {}
   for (const item of features) {
-    let nome = item.properties.name
+    const nome = item.properties.name
     ret[nome] = item.properties
-    let altLabel = item.properties.altLabel
-    ret[altLabel] = item.properties
+
+    const altLabels = item.properties.altLabel
+      ?.split(",")
+      .map(label => label.trim())
+    altLabels?.forEach(label => {
+      ret[label] = item.properties
+    })
   }
   return ret
 }
 
 /**
- * Prende l'oggetto bibliografia e ad ogni item aggiunge una proprietà chiamata match,
- * contenente un array di tag del vocabolario che corrispondono a toponimi.
- * @param {Object} biblio Item della risposta della libreria Zotero
- * @param {Object} voc Voci dell'ontologia
- * @returns {Object} L'oggetto bibliografia come scaricato da Zotero, con la proprietà `match`
+ * Prende l'ogetto bibliografia, come scaricato da Zotero
+ * e ad ogni item aggiunge una propietà chiamata match, un array di tag del vocabolario
+ * @param {Object} biblio item della risposta della libreria Zotero
+ * @param {Object} voc voci dell'ontologia
+ * @returns {Object} L'oggetto bibliografia come scaricato di Zotero con l'aggiunta di una proprietà chiamata match,
+ *                  consistente in un Array di tag del vocabolario
  */
 function parseBiblio(biblio, voc) {
   const map = []
@@ -35,10 +41,10 @@ function parseBiblio(biblio, voc) {
 /**
  * Mappa gli item della bibliografia e confronta con l'ontologia
  * Funzioni da eseguire in ordine:
- * - Estrae i tag dagli item della biblio che iniziano con "@"
- * - Confronta i tag con i toponimi dell'ontologia
- * @param {Object} item Item della risposta della libreria Zotero
- * @param {Object} voc Voci dell'ontologia
+ * - Estrae i tag dagli item della biblio
+ * - updateItemObjWithMatchFromVocProperties se c'è corrispondenza con voc
+ * @param {Object} item item della risposta della libreria Zotero
+ * @param {Object} voc voci dell'ontologia
  */
 function mapItemByVoc(item, voc) {
   const biblioItemTags = item?.tags.length
@@ -49,10 +55,10 @@ function mapItemByVoc(item, voc) {
 
 /**
  * Aggiorna gli item di Zotero in base alla risposta
- * Crea la prop `match` se c'è corrispondenza con il vocabolario
- * @param {object} item Item bibliografico della risposta della libreria Zotero
- * @param {object} voc Voci dell'ontologia
- * @param {Array.<string>} biblioItemTags Tags degli item di Zotero
+ * crea la prop match se c'è corrispondenza con voc
+ * @param {object} item item bibliografico della risposta della libreria Zotero
+ * @param {object} voc voci dell'ontologia
+ * @param {Array.<string>} biblioItemTags tags degli item di Zotero
  * @returns {void}
  */
 function updateItemObjWithMatchFromVocProperties(
@@ -61,35 +67,32 @@ function updateItemObjWithMatchFromVocProperties(
   biblioItemTags = [],
 ) {
   if (!Array.isArray(biblioItemTags))
-    throw new Error("È necessario un array di tag o una stringa")
-
+    throw new Error("is required tags array or string")
   const vocTags = Object.keys(voc)
   if (!item.match) item.match = []
 
-  for (let tag of biblioItemTags) {
-    // Filtra solo i tag che iniziano con "@" e rimuovi il prefisso per il confronto
-    if (tag.startsWith("@")) {
-      const cleanTag = tag.slice(1) // Rimuovi "@"
-
-      // Confronta con i toponimi nell'ontologia
-      if (vocTags.includes(cleanTag)) {
-        item.match.push(voc[cleanTag])
-      }
+  for (const tag of biblioItemTags) {
+    if (vocTags.includes(tag)) {
+      console.log(`Match found: ${tag}`)
+      item.match.push(voc[tag])
     }
   }
 }
 
 /**
- * Raggruppa tutti i libri per matched tag e crea un file GeoJSON
+ * Raggruppa tutti i libri per matched tag e crea un file GeoJESON
  * @param {Object} zoteroBiblioMappedWithVoc Bibliografia con proprietà match
- * @param {Object} geoData Ontologia originale (GeoJSON)
- * @returns {Array} Ontologia originale con, per ogni elemento, proprietà `biblio`, un array con la bibliografia
+ * @param {Object} ontology: Ontologia originale (GeoJSON)
+ * @returns {Array}: L'ontologia originale con, per ogni elemento, proprietà biblio, array con bibliografia
  */
-function mapBibliography(zoteroBiblioMappedWithVoc, geoData) {
+function mapBibliography(zoteroBiblioMappedWithVoc, ontology) {
   for (const zoteroItem of zoteroBiblioMappedWithVoc) {
     if (zoteroItem?.match.length) {
+      // Loop in match property of each Zotero item
       zoteroItem.match.forEach(m => {
-        geoData.features.forEach(mapEl => {
+        // Loop each element of the ontlogy
+        ontology.features.forEach(mapEl => {
+          // If the match element is the same of the ontology name property, add it to the result object
           if (mapEl.properties.name === m.name) {
             if (!mapEl.properties.hasOwnProperty("biblio")) {
               mapEl.properties.biblio = []
@@ -100,8 +103,14 @@ function mapBibliography(zoteroBiblioMappedWithVoc, geoData) {
               tag: zoteroItem.tags,
               author_date:
                 zoteroItem.creators
-                  .map(e => (e.creatorType === "author" ? e.lastName : false))
-                  .filter(Boolean)
+                  .map(e => {
+                    if (e.creatorType === "author") {
+                      return e.lastName
+                    } else {
+                      return false
+                    }
+                  })
+                  .filter(e => e)
                   .join(", ") +
                 ". " +
                 zoteroItem.date,
@@ -112,21 +121,17 @@ function mapBibliography(zoteroBiblioMappedWithVoc, geoData) {
     }
   }
 
-  return geoData
+  return ontology
 }
 
-/**
- * Funzione principale che accetta dati non geografici e dati geografici per il mapping
- * @param {Array} nonGeoData Dati bibliografici (Zotero)
- * @param {Object} geoData Dati geografici (GeoJSON)
- * @returns {Object} GeoJSON con dati bibliografici mappati
- */
-const map2Onto = (nonGeoData, geoData) => {
-  const voc = returnVoc(geoData.features)
-  const zoteroBiblioMappedWithVoc = parseBiblio(nonGeoData, voc).filter(
+const mapBiblio2Onto = (bibliography, ontology) => {
+  const voc = returnVoc(ontology.features)
+
+  const zoteroBiblioMappedWithVoc = parseBiblio(bibliography, voc).filter(
     e => e.match.length > 0,
   )
-  return mapBibliography(zoteroBiblioMappedWithVoc, geoData)
+
+  return mapBibliography(zoteroBiblioMappedWithVoc, ontology)
 }
 
-export default map2Onto
+export default mapBiblio2Onto
