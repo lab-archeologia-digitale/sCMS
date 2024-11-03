@@ -73,7 +73,7 @@ function updateItemObjWithMatchFromVocProperties(
 
   for (const tag of biblioItemTags) {
     if (vocTags.includes(tag)) {
-      console.log(`Match found: ${tag}`)
+      //console.log(`Match found: ${tag}`)
       item.match.push(voc[tag])
     }
   }
