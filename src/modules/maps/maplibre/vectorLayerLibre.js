@@ -67,7 +67,6 @@ const VectorLayerLibre = ({
 
   const fitLayerToBounds = useCallback(() => {
     if (mapRef && geojsonData && fitToContent) {
-      console.log("Dati GeoJSON per il calcolo di bbox:", geojsonData) // Verifica struttura prima di bbox
       const mapInstance = mapRef.getMap()
       const [minLng, minLat, maxLng, maxLat] = bbox(geojsonData)
       mapInstance.fitBounds([

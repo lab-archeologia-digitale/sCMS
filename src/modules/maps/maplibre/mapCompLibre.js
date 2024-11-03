@@ -47,7 +47,6 @@ const MapCompLibre = ({
     const dynamicInteractiveLayers = allLayers
       .map(layer => {
         if (layer.metadata && layer.metadata.popupTemplate) {
-          console.log(`Layer interattivo trovato: ${layer.id}`)
           return layer.id
         }
         return null
