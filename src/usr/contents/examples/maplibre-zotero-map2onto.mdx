@@ -15,10 +15,10 @@ import { MapCompLibre, VectorLayerLibre } from "../../../modules/scms.js"
       baseLayers={["EsriSatellite", "CAWM"]}
     >
       <VectorLayerLibre
-        name="Zotero Sites"
+        name="Zotero Point"
         source={{
           zoteroGroup: "336647",
-          dataOnto: "/data/toponimiZotero.geojson"
+          dataOnto: "/data/toponimiZotero_point.geojson"
         }}
         checked={true}
         fitToContent={true}
@@ -37,14 +37,14 @@ import { MapCompLibre, VectorLayerLibre } from "../../../modules/scms.js"
         }}
         popupTemplate="<h4>${name}</h4><p>${altLabel}</p><ul>${biblioList}</ul>"
       />
-{/* TODO: perché non funziona la visualizzazione dei poligoni? */}
+
       <VectorLayerLibre
-        name="Zotero Sites 2"
+        name="Zotero Areas"
         source={{
           zoteroGroup: "336647",
           dataOnto: "/data/toponimiZotero.geojson"
         }}
-        checked={true}
+        checked={false}
         fitToContent={true}
         searchInFields={{
           "name": "name",
@@ -59,7 +59,7 @@ import { MapCompLibre, VectorLayerLibre } from "../../../modules/scms.js"
         }}
         popupTemplate="<h4>${name}</h4><p>${altLabel}</p><ul>${biblioList}</ul>"
       />
-    
+
     </MapCompLibre>
     Data from [Zotero group Epirus] (https://www.zotero.org/groups/336647/epirus) created by [Julian Bogdani].
 
@@ -76,10 +76,10 @@ import { MapCompLibre, VectorLayerLibre } from "../../../modules/scms.js"
       baseLayers={["EsriSatellite", "CAWM"]}
     >
       <VectorLayerLibre
-        name="Zotero Sites"
+        name="Zotero Point"
         source={{
           zoteroGroup: "336647",
-          dataOnto: "/data/toponimiZotero.geojson"
+          dataOnto: "/data/toponimiZotero_polygon.geojson"
         }}
         checked={true}
         fitToContent={true}
@@ -100,6 +100,48 @@ import { MapCompLibre, VectorLayerLibre } from "../../../modules/scms.js"
        popupTemplate="<h4>${name}</h4><p>${altLabel}</p><ul>${biblioList}</ul>"
       />
 
+      <VectorLayerLibre
+        name="Zotero Areas"
+        source={{
+          zoteroGroup: "336647",
+          dataOnto: "/data/toponimiZotero_point.geojson"
+        }}
+        checked={false}
+        fitToContent={true}
+        searchInFields={{
+          "name": "name",
+          "altLabel": "altLabel",
+        }}
+        style={{
+          type: "fill",
+          paint: {
+            "fill-color": "#ff0000",
+            "fill-opacity": 0.5
+          },
+        }}
+        popupTemplate="<h4>${name}</h4><p>${altLabel}</p><ul>${biblioList}</ul>"
+      />
+      <VectorLayerLibre
+        name="Zotero Areas"
+        source={{
+          zoteroGroup: "336647",
+          dataOnto: "/data/toponimiZotero.geojson"
+        }}
+        checked={false}
+        fitToContent={true}
+        searchInFields={{
+          "name": "name",
+          "altLabel": "altLabel",
+        }}
+        style={{
+          type: "fill",
+          paint: {
+            "fill-color": "#ff0000",
+            "fill-opacity": 0.5
+          },
+        }}
+        popupTemplate="<h4>${name}</h4><p>${altLabel}</p><ul>${biblioList}</ul>"
+      />
     </MapCompLibre>
     ```
 
