@@ -11,7 +11,7 @@ import Map, {
 import PropTypes from "prop-types"
 import SimpleControl from "./simpleControl"
 import { RasterLayerLibre } from "./rasterLayerLibre"
-import { defaultBaseLayers } from "../../maps/defaultBaseLayers"
+import { defaultBaseLayers, defaultBaseLayersPropTypes } from "../../maps/defaultBaseLayers"
 import parseStringTemplate from "../../../services/parseStringTemplate"
 import { withPrefix } from "gatsby"
 
@@ -35,30 +35,18 @@ const MapCompLibre = ({
   const mapInstanceRef = useRef(null)
 
   const updateInteractiveLayers = useCallback(() => {
-    if (!mapInstanceRef.current) {
-      console.warn(
-        "mapInstanceRef.current è null, impossibile aggiornare i layer.",
-      )
-      return
-    }
+    if (!mapInstanceRef.current) return
 
     // Log per vedere tutti i layer presenti nella mappa
-    const allLayers = mapInstanceRef.current.getStyle().layers
-    const dynamicInteractiveLayers = allLayers
-      .map(layer => {
+    const dynamicInteractiveLayers = mapInstanceRef.current
+      .getStyle()
+      .layers.map(layer => {
         if (layer.metadata && layer.metadata.popupTemplate) {
-          console.log(`Layer interattivo trovato: ${layer.id}`)
           return layer.id
         }
         return null
       })
       .filter(Boolean)
-
-    if (dynamicInteractiveLayers.length === 0) {
-      console.warn(
-        "Nessun layer interattivo trovato con metadata.popupTemplate.",
-      )
-    }
 
     interactiveLayersRef.current = dynamicInteractiveLayers
   }, [])
@@ -91,16 +79,6 @@ const MapCompLibre = ({
       mapInstanceRef.current.off("styledata", updateInteractiveLayers)
     }
   }, [updateInteractiveLayers])
-
-  const addNewLayer = useCallback(
-    layer => {
-      if (!mapInstanceRef.current) return
-
-      mapInstanceRef.current.addLayer(layer)
-      updateInteractiveLayers() // Aggiorna l'array dei layer interattivi dopo l'aggiunta
-    },
-    [updateInteractiveLayers],
-  )
 
   const onClick = useCallback(event => {
     const { lngLat, point } = event
@@ -252,25 +230,7 @@ MapCompLibre.propTypes = {
    * Can be one or more of the following: "CAWM", "OSM", "EsriSatellite","EsriStreets", "EsriTopo", "GoogleSatellite", "GoogleRoadmap", "GoogleTerrain", "GoogleAlteredRoadmap", "GoogleTerrainOnly", "GoogleHybrid", "CartoDb", "StamenTerrain", "OSMMapnick", "OSMCycle",
    * Default: null
    */
-  baseLayers: PropTypes.arrayOf(
-    PropTypes.oneOf([
-      "CAWM",
-      "OSM",
-      "EsriSatellite",
-      "EsriStreets",
-      "EsriTopo",
-      "GoogleSatellite",
-      "GoogleRoadmap",
-      "GoogleTerrain",
-      "GoogleAlteredRoadmap",
-      "GoogleTerrainOnly",
-      "GoogleHybrid",
-      "CartoDb",
-      "StamenTerrain",
-      "OSMMapnick",
-      "OSMCycle",
-    ]),
-  ),
+  baseLayers: defaultBaseLayersPropTypes,
 }
 
 export { MapCompLibre }
