@@ -5,13 +5,13 @@ slug: "maps/examples/maplibre-edr-map2onto"
 description: "MapLibre: Adding a vector layer from EDR Epigraphic Database Roma"
 ---
 
-import { MapCompLibre, VectorLayerLibre } from "../../../modules/scms.js"
+import { MapLibre, VectorLayerLibre } from "../../../modules/scms.js"
 
 ### MapLibre: Adding a vector layer from EDR Epigraphic Database Roma
 
 <div className="row mt-3 mb-5 border-top border-bottom py-3">
   <div className="col-6">
-    <MapCompLibre 
+    <MapLibre 
       center="12.492439,41.890064,9"
       baseLayers={["EsriSatellite", "CAWM"]}
     >
@@ -42,18 +42,18 @@ import { MapCompLibre, VectorLayerLibre } from "../../../modules/scms.js"
         popupTemplate="<h4>${nome} (${numEpigrafi})</h4><p>${altLabel}</p><ul>${epiList}</ul>"
       />
     
-    </MapCompLibre>
+    </MapLibre>
     Data from [EDR] (http://www.edr-edr.it/edr_programmi/edr_api.php?ancient_city=roma)
 
   </div>
   <div className="col-6">
     ```jsx
     import {
-      MapCompLibre,
+      MapLibre,
       VectorLayerLibre
     } from "../../../modules/scms.js"
 
-    <MapCompLibre
+    <MapLibre
          center="12.492439,41.890064,9"
       baseLayers={["EsriSatellite", "CAWM"]}
     >
@@ -83,7 +83,7 @@ import { MapCompLibre, VectorLayerLibre } from "../../../modules/scms.js"
       />
 
 
-    </MapCompLibre>
+    </MapLibre>
     ```
 
   </div>
