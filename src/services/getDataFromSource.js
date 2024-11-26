@@ -99,13 +99,20 @@ const getDataFromSource = async source => {
   } else {
     if (dEndPoint) {
       sourceUrl = dEndPoint
-    } else if (process.env.GATSBY_DIRECTUS_ENDPOINT && dTable) {
-      sourceUrl = `${process.env.GATSBY_DIRECTUS_ENDPOINT}items/${dTable}`
+    } else if (process.env.GATSBY_DIRECTUS_ENDPOINT) {
+      sourceUrl = process.env.GATSBY_DIRECTUS_ENDPOINT
     } else {
-      console.log(path2data)
       throw new Error(
-        "Either `dEndPoint` or env variable `GATSBY_DIRECTUS_ENDPOINT` AND `dTable` are needed",
+        "Either `dEndPoint` or env variable `GATSBY_DIRECTUS_ENDPOINT` are needed",
       )
+    }
+    if (dEndPoint || process.env.GATSBY_DIRECTUS_ENDPOINT) {
+      if (!dTable) {
+        throw new Error(
+          "Parameter `dTable` is requirted with `GATSBY_DIRECTUS_ENDPOINT` or `dEndPoint`",
+        )
+      }
+      sourceUrl += `${sourceUrl.endsWith("/") ? "" : "/"}items/${dTable}`
     }
     if (id) {
       sourceUrl += `/${id}`

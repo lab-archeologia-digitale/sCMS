@@ -23,7 +23,7 @@ Static sites are fast, secure, durable: no databases to manage, no code that get
 1. [Adding content](#adding-content)
 1. [Deploy your site for free on Github Pages]()
 1. [API](#api)
-   1. [Access your data](#access-your-data)
+   1. [Access data from components](#access-data-from-components)
    1. [MapLeaflet](#mapleaflet)
    1. [MapContainer](#mapcontainer)
    1. [LayersControl](#layerscontrol)
@@ -276,147 +276,184 @@ A page that displays an item's details in a simple list format and can be custom
 
 ## API
 
-### Access your data
+### Access data from components
 
-As previously mentioned, s:CMS is principally designed for the creation of web pages with dynamic content retrieved by an Ajax call from a local CSV or GeoJSON file stored in your project, or a remote database structured in Directus.
+Most of the S:CMS componens have a unified interface to access data stored in local/remote files or on a Directus instance. Thi interface also implements some default basic data transformation services. These parameters are collected in a literal object names `source` that can be provided to the single components.
 
-For complete documentation on the API system of Directus, see: https://docs.directus.io/reference/introduction.html
+The `source` object must follow the following shape:
 
-For integration of your data into the project, the following props must be used:
+| Prop Name | Type | Required | Default value | Description |
+|----------|------|-------------------|---------------|-------------|
+| `path2data` | string | no (required if `dEndPoint` or `dTable` are not set) | _null_ | Path to static file of structured data (JSON, GeoJSON, CSV, etc.): might be a local, relative path or an URL. |
+| `dEndPoint` | string | no (required if either `path2data` nor environmental variable `GATSBY_DIRECTUS_ENDPOINT` or are not set) | _null_ | Full URL of the API endpoint of a Directus running instance. |
+| `dTable` | string | no (required if `dEndPoit` or `GATSBY_DIRECTUS_ENDPOINT` are set). | _null_ | The table name of a running Directus instance. |
+| `dToken` | string | no (required if environmentantal variable `GATSBY_DIRECTUS_TOKEN` is not set and the Directus API requires authentication) | _null_ | Access token to accedd the Directus API, if needed. |
+| `dQueryString` | string | no | _null_ | A query-string formatted filter that will be appended to the endpoint to form an API filter for the data. |
+| `id` | integer | no (required if retrieving a record) | _null_ | Id of a specific record to retrieve. |
+| `transType` | string | no | "geojson" | Tranformation to apply to data retrieved from the api of from the file system. One of the following values can be used: "text", "csv2json", "json", "geojson". |
 
-| Field     | Type    | Description                                                          |
-|-----------|---------|----------------------------------------------------------------------|
-| `path2data`  | String  | Relative or full path to the static file containing your data        |
-| `dEndPoint` | String  | Full URL pointing to a Directus endpoint, complete with referenced table name |
-| `dToken`    | String  | Directus access token, required if the table is not public. If not provided, the `GATSBY_DIRECTUS_TOKEN` environment variable will be used |
-| `dTable`    | String  | Directus table containing geographical data. This is an alternative way to point to a Directus table and needs the the `GATSBY_DIRECTUS_TOKEN` environment variable to be set |
-| `dQueryString` | String | A string containing the filter to apply to your complete API, already inserted as `dEndPoint` or `dTable` |
+s:CMS provides a way to define a default Directus API data source as [environment variables](https://www.gatsbyjs.com/docs/how-to/local-development/environment-variables/). In development, Gatsby will load environment variables from a file named `.env.development`. For builds, it will load from `.env.production`. If you are using GitHub Pages as a deployment platform, you can use [secrets](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions). s:CMS handles automatically the following environmental variables:
 
-The preferred way to point to a Directus database is via environment variables and `dTable` parameter, both for security (it prevents exposure of your credentials) and practicality. Two or more different Directus instances can be referred at the same time, using both methods.
-
-`dQueryString` can also be used for displaying data from different tables linked through relational logic (i.e. define JOINs) or for implementing a limiter (offset) on large databases to facilitate data flow.
-
-For comprehensive documentation, please refer to the official Directus.io API documentation: https://docs.directus.io/reference/introduction.html
+- `GATSBY_DIRECTUS_ENDPOINT`: a replacement of the parameter `source.dEndPoint`
+- `GATSBY_DIRECTUS_TOKEN`: a replacements of the paramater `source.dToken`
 
 ### MapLeaflet
 
-This is a component used to vcreate maps using Leaflet and it is a wrapper around [`MapContainer`]((https://react-leaflet.js.org/docs/api-map/)) and [`LayersControl`](https://leafletjs.com/reference.html#control-layers) and that contains and manages the graphical display and ordering of the layers. 
+The `MapLeaflet` component is used to create maps using Leaflet.js and it is a wrapper around [`MapContainer`](https://react-leaflet.js.org/docs/api-map/) module.
 
-It accepts `VectorLayer` and `RasterLayer` as children.
+**Props**
 
-It accepts the following props:
+| Prop Name | Type | Required | Default value | Description |
+|----------|------|-------------------|---------------|-------------|
+| `height` | string | no | "800px" | Height (with unit) of the map element. |
+| `center` | string | no | "0,0,2" | Center of the map, as a string with long, lat and zoom separated by commas. |
+| `baseLayers` | array | no | _null_ | Array with default baselayers to show. One, or many of the following values: "CAWM" "OSM", "EsriSatellite", "EsriStreets", "EsriTopo", "GoogleSatellite", "GoogleRoadmap", "GoogleTerrain", "GoogleAlteredRoadmap", "GoogleTerrainOnly", "GoogleHybrid", "CartoDb", "StamenTerrain", "OSMMapnick", "OSMCycle". |
+| `scrollWheelZoom` | boolean | no | _false_ | Boolean value that controles whether zoom wheel is active or not. |
+| `layersControlPosition` | string | no | "topright" | Position of the layers control, one of the following values: "topright", "topleft", "bottomright" "bottomleft". |
 
-| Field           | Type      | Default | Description                                                                   |
-|-----------------|-----------|---------|-------------------------------------------------------------------------------|
-| height          | String    | `600px` | The height of the map |
-| center          | String    | `0,0,2` | Defines the starting coordinates and zoom of the map: longitude,latitude,zoom level |
-| scrollWheelZoom | bool      | `false` | If true, enables the user's ability to zoom the map using the scroll wheel |
-| baseLayers      | String    | `null`  | Comma separated list of default raster base map (one or more from): `OSM`, `EsriSatellite`, `EsriStreets`, `EsriTopo`, `GoogleSatellite`, `GoogleRoadmap`, `GoogleTerrain`, `GoogleAlteredRoadmap`, `GoogleTerrainOnly`, `GoogleHybrid`, `CartoDb`, `StamenTerrain`, `OSMMapnick`, `OSMCycle`
-| layerControlPosition | String | `toptight' | Posiont of the Layer Controle. Refer to [offial Leaflet Docs](https://leafletjs.com/reference.html#control-position)
+`MapLeaflet` accepts none, one or more `VectorLayer` and/or `RasterLayer` instances as child components
 
-### Vectorlayer
 
-`VectorLayer` is the component that allows you to import, display, and customize your geographical vector data. It must be used as a child of `MapLeaflet` component. It can be populated with data from different sources, like:
+### VectorLayer
+
+The `VectorLayer` component can be used to import, display, and customize your geographical vector data in the map. It must be used as a child of `MapLeaflet` component. A vector layer can be populated with data from different sources, such as:
 - a local GeoJSON file
 - a remote GeoJSON file
 - a table of Directus instance containing geographical data.
-Parameters for accessing data, such as `path2data`, `dEndPoint`, `dTable`, `geoField`, `dQueryString` and `dToken` are [documented above](#access-your-data).
-Other parameters are:
+
+**Props**
+
+| Prop Name | Type | Required | Default value | Description |
+|----------|------|-------------------|---------------|-------------|
+| `source` | object | yes |  | For the complete documentation: [Access data from components](#access-data-from-components). |
+| `name` | string | yes |  | Layer name to use in the Layer control |
+| `popupTemplate` | string | no | _null_ | A string containing the HTML to render in the popup. Variable propertirs can be used using ${field_name} syntax. |
+| `pointToLayer` | function | no | _null_ | A function defining how GeoJSON points spawn Leaflet layers. It is internally called when data is added, passing the GeoJSON point feature and its LatLng as properties. The default is to spawn a default Marker. Full reference at https://leafletjs.com/reference.html#geojson-pointtolayer. |
+| `filter` | function | no | _null_ | A function that will be used to decide whether to include a feature or not in the current visualisation. The default is to include all features (no filter applied). |
+| `checked` | boolean | no | true | Boolean property to control the layer's default visibility ion the map and control panel |
+| `fitToContent` | boolean | no | _false_ | Boolean property to decide wether to zoom/pan the map to fit the layer extention or not. |
+
+
+### RasterLayer
+
+The `RasterLayer` components can be used to import and display raster tiles in the map. It must be used as a child of `MapLeaflet` component.
+ 
+
+**Props**
+
+| Prop Name | Type | Required | Default value | Description |
+|----------|------|-------------------|---------------|-------------|
+| `name` | string | yes | _null_ | Name of the baselayer to show in Layer control|
+| `url` | string | yes | _null_ | URL where raster tiles are found. |
+| `checked` | boolean | no | _false_ | Property to control the layer's default visibility ion the map and control panel. |
+| `attribution` | string | no | _null_ | Attribution or credits for the layer. |
+| `asOverlay` | boolean | no | _false_ | If true the layer will be listed in the Overlay list; if false (default) in the base-layers list. |
+
+
+### MapLibre
+
+The `MapLibre` component is used to create maps using MapLibre and it is a wrapper around [`react-map-gl`](https://visgl.github.io/react-map-gl/) module. It aims to be a full replacement of the MapLeaflet, by maintaining the same API and possibly providing enhanced functionality, mainly related to the native support for vector tiles.
+
+**Props**
+
+| Prop Name | Type | Required | Default value | Description |
+|----------|------|-------------------|---------------|-------------|
+| `height` | string | no | "800px" | Height (with unit) of the map element. |
+| `center` | string | no | "0,0,2" | Center of the map, as a string with long, lat and zoom separated by commas. |
+| `baseLayers` | array | no | _null_ | Array with default baselayers to show. One, or many of the following values: "CAWM" "OSM", "EsriSatellite", "EsriStreets", "EsriTopo", "GoogleSatellite", "GoogleRoadmap", "GoogleTerrain", "GoogleAlteredRoadmap", "GoogleTerrainOnly", "GoogleHybrid", "CartoDb", "StamenTerrain", "OSMMapnick", "OSMCycle". |
+| `scrollWheelZoom` | boolean | no | _false_ | Boolean value that controles whether zoom wheel is active or not. |
+| `layersControlPosition` | string | no | "topright" | Position of the layers control, one of the following values: "topright", "topleft", "bottomright" "bottomleft". |
+
+`MapLeaflet` accepts none, one or more `VectorLayer` and/or `RasterLayer` instances as child components
+
+### VectorLayerLibre
+
+The `VectorLayerLibre` component is a React component that renders a vector layer on a map using GeoJSON data. It manages the layer's style, visibility, and data fetching.
+
+**Props**
+
+| Prop | Type | Required | Default value | Description |
+|---|---|---|---|---|
+| `source` | Object | Yes | _null_ | Data source for the GeoJSON. For the complete documentation: [Access data from components](#access-data-from-components).  |
+| `refId` | string | No | _null_ | Reference ID for the layer, as defined in the external styles.json file. It is used to oveerride the layer name / style / popup etc. |
+| `style` | Object | No | _null_ | Style configuration for the layer. For the complete documentation see: [https://maplibre.org/maplibre-style-spec/layers/](https://maplibre.org/maplibre-style-spec/layers/)|
+| `name` | string | Yes | _null_ | Layer name to use in the Layer control. |
+| `searchInFields` | Array | No | _null_ | Array containing field that will be exposed to the search interface. If missing the layer will NOT be searcheable. |
+| `fitToContent` | boolean | No | false | Whether to fit the map to the content. |
+| `checked` | boolean | No | false | Whether the layer is checked/visible. |
+| `popupTemplate` | string | No | _null_ | A string containing the HTML to render in the popup. Variable props can be injected using ${field_name} syntax. |
+
   
 
-| Field         | Type                | Default       | Description                                                                  |
-|---------------|---------------------|---------------|------------------------------------------------------------------------------|
-| name          | string              |               | Specifies the name of the layer as it appears in the LayersControl tool.      |
-| popupTemplate | Accepts other props |               | A custom popup template for viewing geographical objects' attributes. Can include fields from your project. |
-| pointToLayer  | bool                | CircleMarker  | Function defining how to display point features. See: https://leafletjs.com/reference.html#circlemarker |
-| checked       | bool                | `true`        | If true, the layer is displayed by default on the map.                       |
-| fitToContent  | bool                | `true`        | If true, adjusts the map's view to fit the bounds of the current layer.      |
+### RasterLayerLibre
 
-(see here: [Access your data](#access-your-data)) to know how correctly setting the path to your data.
+The `RasterLayerLibre` component is designed to render a raster layer on a MapLibre map. This documentation provides an overview of the component and its props.
 
-##### Rasterlayer and DefaultBaseLayers
+**Props**
 
-These two components manage the raster base of your map. In `DefaultBaseLayers`, each possible source is defined as a prop, which can be added to your `MapLeaflet` Wrapper.
 
-Each declared object has the following attributes:
+| Prop | Type | Required | Default value | Description |
+|---|---|---|---|---|
+| `name` | string | Yes | _null_ | The name of the layer to be displayed in the Control Panel. |
+| `url` | string \| string[] | Yes |  _null_ | The URL(s) of the raster tiles. Can be a single string or an array of strings. |
+| `checked` | boolean | Yes |  false | Determines if the layer is visible or not. If true, the layer is displayed. |
+| `attribution` | string | No |  _null_ |Optional attribution or credits for the layer. |
 
-| Field        | Type   | Required | Description                                          |
-|--------------|--------|----------|------------------------------------------------------|
-| checked      | string | y        | The name to be displayed on your website.            |
-| fitToContent | string | y        | The URL of the tiled map you want to use.            |
-| geoField     | string | n        | A string to credit the original creators of the tiled map (necessary for licensed material). |
 
-In the `MapLeaflet` Wrapper, the attributes of each item are used in the `RasterLayer` structure, which also allows you to add the following prop to your layer:
+### DataTb
 
-| Field     | Type  | Default | Description                                           |
-|-----------|-------|---------|-------------------------------------------------------|
-| AsOverlay | bool  | N       | If true, displays the raster layer as an overlay. If false, the layer is treated as a base layer, mutually excluding other base layers. |
+The `DataTb` component displays data ordered in a two-dimensional table. It can be populated with data from a Directud API endpoint, a static CSV or JSON files hosted locally or in the WWW. Under the hood DataTb uses the [React Data Table Component](https://react-data-table-component.netlify.app/?path=/docs/getting-started-intro--docs) and supports out of the box all configurations and settings described on the [official documentation](https://react-data-table-component.netlify.app/?path=/docs/getting-started-intro--docs). An example of these settings is provided below:
 
-#### dtable
+**Props**
 
-A component to display data in a tabular fashion that accepts as arguments data from your database(s) (see how to link your data to your table here: [Access your data](#access-your-data)). The data can also be filtered. It is built on the React Datatable component, supporting all its graphical configurations (https://primereact.org/datatable). An example of these settings is provided below:
+| Prop Name | Type | Required | Default value | Description |
+|----------|------|-------------------|---------------|-------------|
+| `source` | object | yes |  _null_ | For the complete documentation: [Access data from components](#access-data-from-components). |
+| `columns` | object | yes | _null_ | Object containing information on the columns of the table. The full documentation is available in the [official documentation](https://react-data-table-component.netlify.app/?path=/docs/api-columns--docs)|
+| `...props` |  |  |  | All parameters described in the [official React Data Table Component documentation](https://react-data-table-component.netlify.app/?path=/docs/api-props--docs) can be used with this component. |
 
-| Field    | Type | Default  | Description                                                              |
-|----------|------|----------|--------------------------------------------------------------------------|
-| striped  | bool | `true`   | If true, visualize alternative rows as striped. See: https://primereact.org/datatable/#striped |
 
-##### Columns
-
-Property of `Dtable` that allows customization of data display within the module. It accepts the following arguments:
-
-| Field    | Type              | Default           | Description                                                                                                    |
-|----------|-------------------|-------------------|----------------------------------------------------------------------------------------------------------------|
-| name     | string            | `Site_name`       | Define the heading name of your column                                                                         |
-| Selector | row               | Accept a function | `row["Site_Name"]` - This property allows access to values associated with a specific key. You can modify and/or concatenate multiple arguments using expressions and variables. IMPORTANT: All data will be automatically rendered as a string. This can be modified via a custom function. See field `Date` in: https://lab-archeologia-digitale.github.io/sCMS/modulo-datatable/ |
-| cell     | Accept a function | `image, external link` | Retrieve data from columns with additional customization options for presentation using HTML/React and the ability to implement external links. See fields `item_label` and `thumbnail` in: https://lab-archeologia-digitale.github.io/sCMS/modulo-datatable/ |
-| sortable | bool              | `true`            | If true, allows the user to sort data by field`s value initials. See: https://primereact.org/datatable/#sort    |
-
-##### Query Tool
-
-Finally, `Datatb` also includes a custom search tool added to your front end to dynamically modify the displayed data. For backend data filtering see here: [Filtering and join options](#filtering-and-join-options). The attributes of the query tool are:
-
-| Field       | Type         | Default             | Description                                                                 |
-|-------------|--------------|---------------------|-----------------------------------------------------------------------------|
-| name        | datatype     | `Text`              | Define the type of data for user`s search.                                  |
-| className   | CSS styler   | `form-control mb-5` | For graphic customization of the query tool. Accepts existing and/or custom CSS classes. |
-| placeholder | Text         | `search…`           | Default value shown in the query tool placeholder.                          |
-
-NB: All data will be automatically rendered as text upon activation of the query.
-
-It is important to note that the tool does not perform case-sensitive searches and scans through all visible fields in the table module. For constructing specific search fields, see [Search](#search).
 
 ## Search
 
-The `Search` component shows a double search — both a simple and an advanced one — connected to your data that a user can use to filter them and finally list the results by defining a customised template.
+The `Search` component is a React component that provides a user interface for searching data from a specified source. It allows users to input search criteria and displays the results based on a provided template.
 
-The query can be directed to selected fields using the following prop:
+**Props**
 
 
-| Parameter   | Required | Type   | Description |
-|-------------|----------|--------|-------------|
-| `dEndPoint`   |          | string | See above [Access your data](#access-your-data) |
-| `dTable`      |          | string | See above [Access your data](#access-your-data) |
-| `dToken`      |          | string | See above [Access your data](#access-your-data) |
-| `dQueryString` |         | string | See above [Access your data](#access-your-data) |
-| `fieldList`   |    Y     | object | Object containing the names of the field that will be available in tha advanced search form. Keys are database name of the fields; values the labels to be shown. In simple search, the query will be limited to these fields |
-| `resultItemTemplate` | N | func | Function to be used to show the results. It will receive the object cotaining data about a single item |
-| `operators`   |    N     | object | TODO |
-| `connector`   |    N     | object | TODO |
+| Prop Name | Type | Required | Default value | Description |
+| --- |--- | --- | --- | --- |
+| `source` | Object | Yes | _null_ | An object containing information to source data. This should include the necessary properties for querying the data source. [More info on source object](#access-data-from-components)|
+| `resultItemTemplate`| Function | Yes | _null_ | A template function to render each result item. This function receives an item from the search results and should return a React element. |
+| `fieldList` | Object | Yes | _null_ | An object defining the fields available for querying. |
+| `operators` | Object | No | <pre lang="json">{<br> "_eq": "Equals",<br> "_neq": "Doesn't equal",<br> "_lt": "Less  than",<br> "_lte": "Less than or equal to",<br> "_gt": "Greater than",<br> "_gte": "Greater than or equal to",<br> "_null": "Is null",<br> "_nnull": "Isn't null",<br> "_contains": "Contains",<br> "_icontains": "Contains (case-insensitive)",<br> "_ncontains": "Doesn't contain",<br> "_starts_with": "Starts with",<br> "_istarts_with": "Starts with (case-insensitive)",<br> "_nstarts_with": "Doesn't start with",<br> "_nistarts_with": "Doesn't start with (case-insensitive)",<br> "_ends_with": "Ends with",<br> "_iends_with": "Ends with (case-insensitive)",<br> "_nends_with": "Doesn't end with",<br> "_niends_with": "Doesn't end with (case-insensitive)",<br> "_empty": "Is empty",<br> "_nempty": "Isn't empty"<br> }</pre> | An object containing the identifiers of the operators (keys) and the labels to use for the UI. This can be used to overwrite default options, for example, to have the UI translated in a different language. |
+| `connector` | Object | No | <pre lang="json">{<br> "_and": "AND",<br> "_or": "OR"<br>}</pre> | An object containing the logical connectors (keys) and the labels to use for the UI. This can be used to overwrite the default value, for example, to have the UI translated in a different language. |
 
-For more advanced query logic, see here: [Filtering and join options](#filtering-and-join-options).
 
-For the resulting template, the following arguments are given:
 
-| Field | Type | Default                            | Description                                                   |
-|-------|------|------------------------------------|---------------------------------------------------------------|
-| key   | id   | {item.id}                          | Necessary element for indexing results. Do not modify.        |
-| Item  |      | `item.Item_Label; item.Site_Name`  | Selected fields shown for each element`s template.            |
-| <a href=> | URL  | `(`https://inrome.sns.it/db/items/scms_ksa`)}&tb=scms_ksa&token=I0pT7ozY0KuK8i-vtwLQGek36s0IhQ5e&id=${item.id}`}` | A reference linking the `view` button to the item`s record page. Complete endpoint and token must be provided. |
 
-As shown in the [example`s page](https://lab-archeologia-digitale.github.io/sCMS/simple-search/), HTML/CSS syntax can be used for further customisation and organization of the results.
+### Record
 
-### View Record
+The `Record` component is a React component that fetches and provides record data based on specified search parameters. It handles loading and error states and renders its children once the data is available. The component utilizes the React Context API to provide the fetched record data to its descendants.
 
-A detailed item page that can be linked to your main pages. In its default view, it shows every key-value pair associated with the element in a simple list. It can be personalized via JSX syntax ([JSX Documentation](https://legacy.reactjs.org/docs/introducing-jsx.html)), keeping in mind that:
-- `itemEl[0]` represents the key (field`s name);
-- `itemEl[1]` represents the associated value for that item.
+**Props**
+| Prop Name | Type | Required | Default value | Description |
+|---|---|----|---|---|
+| `search` | Object | Yes | _null_ | An object containing the search parameters. |
+| `search.tb` | string | YES | _null_ | The name of the Directus table to fetch data from. |
+| `search.endPoint` | string | No if env variable `dEndPoint` is set | _null_ | The Directus endpoint to fetch data from. |
+| `search.token` | string | No if env variable `dToken` is set | The Directus token for authentication (optional). |
+| `search.id` | string | Yes | _null_ | The ID of the record to fetch. |
+| `children`| ReactNode | Yes | _null_ | Child components to render once the data is fetched. `Field` component can be used to show data for specific field. |
+
+
+### Field
+
+The `Field` component is a React component that retrieves and displays data from the `Record`. It allows for optional transformation of the data before rendering.
+
+
+**Props**
+| Prop Name | Type | Required | Default value | Description |
+|---|---|----|---|---|
+| `name` | Array<string> | Yes | _null_ | An array of strings representing the keys or indices of the data to retrieve. <br> Example: <br> If the data is {"one": "One Value", "two": ["Two value #1", "Two value 2"]}, then name: ["one"] will return "One Value" and name: ["two", "1"] will return "Two value 2". |
+| `transformer` | Function (optional) | No | `JSON.stringify`, if data is not a string | A function that receives the retrieved data as input and performs transformation or any other type of logic. <br> Example: You can use this to loop through an array of child data. <br> If not provided, the component will use JSON.stringify on non-string data. |
